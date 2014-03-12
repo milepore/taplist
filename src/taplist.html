@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Beer List</title>
+
+    <!-- Bootstrap -->
+    <link href="bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" type="text/css" href="taplist.css" />
+  </head>
+
+  <body>
+    <!-- Wrap the rest of the page in another container to center all the content. -->
+
+    <div class="container container-fill">
+        <!-- Three columns of beer -->
+        <div class="row">
+          <div class="col-md-11" id="tap-title">
+            <span class="title-text"><img src="beer-mug.svg" height="40" width="40">Tap List<img src="beer-mug.svg" height="40" valign="center" width="40"></span>
+          </div>
+          <div class="col-md-1">
+            <div class="dropdown pull-right">
+              <button class="btn btn-default btn-xs dropdown-toggle" style="vertical-align:top;" type="button" data-toggle="dropdown">
+                Options<span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="global-dropdown">
+                <li role="presentation"><a role="menuitem" tabindex="-1" onClick="editTapList()" href="#">Edit Tap List</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" onClick="editOptions()" href="#">Edit Options</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" onClick="addBeer()" href="#">Add Beer</a></li>
+              </ul>
+            </div>
+          </div>
+        </div> <!-- beers - /.row -->
+        <div id="beers" class="row"></div> <!-- beers - /.row -->
+    </div>
+
+      <!-- START THE DETAILS -->
+    <div class="container">
+
+      <div id="beer-detail">
+      </div> <!-- beer-detail -->
+
+      <!-- /END THE DETAILS -->
+
+
+      <!-- FOOTER -->
+      <footer>
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>&copy; 2014 Company, Inc. &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
+      </footer>
+
+    </div><!-- /.container -->
+
+  <!-- Edit Tap List Modal -->
+  <div class="modal fade" id="edit-tap-list" tabindex="-1" role="dialog" aria-labeledby="editTapListModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="editTapListModalLabel">Edit Tap List</h4>
+        </div>
+        <div class="modal-body">
+          <form role="form">
+            <div id="tap-list-selects">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onClick="saveTapList();">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Options Modal -->
+  <div class="modal fade" id="edit-options" tabindex="-1" role="dialog" aria-labeledby="editOptionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="editOptionsModalLabel">Edit Options</h4>
+        </div>
+        <div class="modal-body">
+          <form role="form">
+            <div class="form-group">
+              <label for="numTaps">Number Taps</label>
+              <input type="text" class="form-control" id="editNumTaps" placeholder="# Taps">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onClick="saveOptions();">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Beer Modal -->
+  <div class="modal fade" id="edit-beer" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="myModalLabel">Edit Beer</h4>
+        </div>
+        <div class="modal-body" id="edit-beer-body">
+          <form role="form">
+            <div class="form-group">
+              <label for="beerName">Name</label>
+              <input type="text" class="form-control" id="editBeerName" placeholder="Enter Beer Name">
+            </div>
+            <div class="form-group">
+              <label for="beerStyle">Style</label>
+              <input type="text" class="form-control" id="editBeerStyle" placeholder="Enter Beer Style">
+            </div>
+            <div class="form-group">
+              <label for="beerImg">Image URL</label>
+              <input type="url" class="form-control" id="editBeerImg" placeholder="Enter Beer Image URL">
+            </div>
+            <div class="form-group">
+              <label for="beerLongDescription">Long Description</label>
+              <textarea class="form-control" rows="3" id="editBeerLongDescription"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="beerABV">% ABV</label>
+              <input type="number" class="form-control" id="editBeerABV" placeholder="ABV">
+            </div>
+            <div class="form-group">
+              <label for="beerABV">IBU</label>
+              <input type="number" class="form-control" id="editBeerIBU" placeholder="IBU">
+            </div>
+            <input type="hidden" id="editBeerIndex">
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onClick="saveBeer();">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- tempalte for the beer detail section -->
+  <script id="beer-detail-template" type="text/x-handlebars-template">
+     <a name="beer{{index}}"/>
+       <div class="row beer-detail-entry">
+         <div class="col-md-4">
+           <img class="img-circle center-block" src="{{beer.img}}" width="200" height="200" alt="">
+         </div>
+         <div class="col-md-7">
+           <div>
+             <div class="row">
+               <h2>{{beer.name}}</h2>
+             </div>
+             <div class="row">
+               <p>{{beer.longDescription}}</p>
+             </div>
+             <div class="row">
+               <div class="col-md-2"></div>
+               <div class="col-md-4">{{beer.abv}}% abv</div>
+               <div class="col-md-4">{{beer.ibu}} ibu</div>
+               <div class="col-md-2"></div>
+             </div>
+           </div>
+         </div>
+         <div class="dropdown pull-right col-md-1">
+           <button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
+             Edit<span class="caret"></span>
+           </button>
+           <ul class="dropdown-menu" role="menu" aria-labelledby="global-dropdown">
+             <li role="presentation"><a role="menuitem" tabindex="-1" onClick="editBeer({{index}})" href="#">Edit Beer</a></li>
+             <li role="presentation"><a role="menuitem" tabindex="-1" onClick="deleteBeer({{index}})" href="#">Delete Beer</a></li>
+           </ul>
+         </div>
+        </div>
+  </script>
+
+  <!-- template for the beer tap section -->
+  <script id="beer-tap-template" type="text/x-handlebars-template">
+    <div class="col-md-3" id="beer-tap">
+      <div class="row"><div class="col-md-12" style="text-align:center">
+        <h3>Tap {{tapName}}</h3>
+      </div></div>
+      <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-4">{{beer.abv}}% abv</div>
+        <div class="col-md-4" style="text-align:right;">{{beer.ibu}} ibu</div>
+        <div class="col-md-2"></div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <img class="img-circle center-block" src="{{beer.img}}" width="200" height="200" alt="">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12 center-block"><p class="text-center"><a href="#beer{{index}}">{{beer.name}}</a></p></div>
+      </div>
+      <div class="row">
+        <div class="col-md-12 col-centered"><p class="text-center"><span class="italic">{{beer.style}}</span></p></div>
+      </div>
+    </div>
+    <div class="col-md-1"/>
+  </script>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- script for openkeyval - store in the cloud -->
+    <!--<script src="http://cdn.openkeyval.org/statics/openkeyval.packed.js"></script>-->
+    <script src="bootstrap.min.js"></script>
+    <script src="handlebars-v1.3.0.js"></script>
+    <script src="taplist.js"></script>
+    <script lang="javascript">
+      loadData();
+      render();
+    </script>
+  </body>
+</html>
