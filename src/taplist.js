@@ -7,42 +7,104 @@ var beerData = {
   tapList : [ ]
 };
 
+var defaultBeerData = {
+      options : { },
+      beers : [ { name : "Beer", img : "beer-img.png" } ],
+      tapList : [ 0, 0, 0 ]
+};
+
 // if our data is corrupted, this resets it to a basic beer and no tap list
 var resetData = function() {
     // reset beer and taplist
-    beerData = {
-      options : { },
-      beers : [ { name : "Beer" } ],
-      tapList : [ 0, 0, 0 ]
-    };
+    beerData = defaultBeerData;
 }
 
-// saves the data
+/**
+ * Initialize the web application.  Check to see if we're just got back from DropBox authentication, and then load the data.
+ */
+var init = function() {
+    DropBox.init(editDropBox);
+    loadData(render);
+}
+
+/**
+ * Save the current set of data.  Both in Local Storage, as well as in DropBox if we are setup for that.
+ */
 var saveData = function() {
-  localStorage.setItem("beerData", JSON.stringify(beerData));
+    var jsonString = JSON.stringify(beerData);
+    localStorage.setItem("beerData", jsonString);
+    DropBox.save("default", jsonString);
+}
+
+/**
+ * Update the dialog of dropbox options based on our current state
+ */
+var updateDropBoxDialog = function() {
+    if (DropBox.isConnected()) {
+	$('#connectDropBoxBtn').prop('disabled', true);
+	$('#disconnectDropBoxBtn').prop('disabled', false);
+    } else {
+	$('#connectDropBoxBtn').prop('disabled', false);
+	$('#disconnectDropBoxBtn').prop('disabled', true);
+    }
+}
+
+/**
+ * Updates the dropbox dialog, save the state that it is showing, and displays
+ * the dropbox dialog
+ */
+var editDropBox = function() {
+    localStorage.setItem("connecting-to-dropbox", true);
+
+    updateDropBoxDialog();
+    $('#edit-drop-box').modal('show');
+}
+
+/**
+ * Closes the dropbox dialog, and then attemps to load data from dropbox.
+ */
+var closeDropBox = function() {
+    localStorage.setItem("connecting-to-dropbox", false);
+    $('#edit-drop-box').modal('hide');
+    DropBox.load("default", setBeerDataFromString, render);
 }
 
 // checks to see if the beer data is in the right structure
 var beerDataValid = function(beerDataObject) {
-  if (beerDataObject.beers[0] == undefined || beerDataObject.tapList[0] == undefined) {
-    return false;
-  }
-  return true;
+    if (beerDataObject == undefined)
+	return false;
+
+    if (beerDataObject.beers == undefined || beerDataObject.tapList == undefined || beerDataObject.options == undefined)
+	return false;
+    
+    if (beerDataObject.beers[0] == undefined || beerDataObject.tapList[0] == undefined) {
+	return false;
+    }
+    return true;
+
+}
+
+// sets the beer data object from a string
+// makes sure that the entire object is loaded.
+var setBeerDataFromString = function(beerDataString) {
+    var beerDataObject = JSON.parse(beerDataString);
+    if (beerDataValid(beerDataObject)) {
+        beerData = beerDataObject;
+    }
 }
 
 // loads the data, and trys to make sure its valid
 // if the data doesn't exist, or if its invalid, sets our beer to our default data
-var loadData = function() {
-  try {
-    resetData();
+var loadData = function(render) {
+    try {
+	resetData();
+	
+	var beerDataTemp = localStorage.getItem("beerData");
+	if (beerDataTemp) {
+	    setBeerDataFromString(beerDataTemp);
+	}
 
-    var beerDataTemp = localStorage.getItem("beerData");
-    if (beerDataTemp) {
-      var beerDataObject = JSON.parse(beerDataTemp);
-      if (beerDataValid(beerDataObject)) {
-        beerData = beerDataObject;
-      }
-    }
+	DropBox.load("default", setBeerDataFromString, render);
   } catch (err) {
     // our beer data is already reset, don't worry about it
   }
@@ -107,6 +169,7 @@ var addBeer = function() {
  */
 var updateEditOptions = function(options) {
     $('#editNumTaps').val(options.numTaps);
+    $('#editOpenKeyValKey').val(options.openKeyValKey);
 }
 
 /**
@@ -117,6 +180,8 @@ var getOptionsFromEdit = function() {
     var options = {};
 
     options.numTaps = $('#editNumTaps').val();
+    options.openKeyValKey = $('#editOpenKeyValKey').val();
+
     return options;
 }
 
